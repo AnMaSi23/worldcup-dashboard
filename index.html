@@ -27,26 +27,27 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',system-ui,-apple-s
 
 /* Layout */
 .wrap{max-width:1320px;margin:0 auto;padding:1.5rem 2rem 3rem}
-.top3-row{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:12px;margin-bottom:1.5rem}
+.top3-row{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:12px;margin-bottom:1.5rem;align-items:start}
 .boards{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:1.5rem}
 .sec-title{font-size:10px;color:var(--tx3);font-weight:500;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:10px}
 
 /* Top 3 Cards */
 .t3{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:1.1rem 1.25rem;position:relative;transition:border-color .2s}
-.t3-1{border-color:rgba(201,169,110,.2);background:linear-gradient(180deg,rgba(201,169,110,.04) 0%,var(--card) 100%)}
+.t3-1{border-color:rgba(201,169,110,.3);background:linear-gradient(180deg,rgba(201,169,110,.06) 0%,var(--card) 100%);box-shadow:0 0 30px rgba(201,169,110,.06),0 1px 2px rgba(0,0,0,.3);transform:scale(1.03)}
 .t3-2{border-color:rgba(138,138,142,.12)}
 .t3-3{border-color:rgba(138,114,98,.12)}
 .t3-rank{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
-.t3-rank-1{color:var(--gold)}
+.t3-rank-1{color:var(--gold);font-size:11px;letter-spacing:1.5px}
 .t3-rank-2{color:var(--silver)}
 .t3-rank-3{color:var(--bronze)}
-.t3-name{font-size:16px;font-weight:500;color:var(--tx);margin-bottom:2px}
-.t3-1 .t3-name{font-size:18px}
+.t3-name{font-size:15px;font-weight:500;color:var(--tx);margin-bottom:2px}
+.t3-1 .t3-name{font-size:19px;font-weight:500}
 .t3-pts{font-size:22px;font-weight:300;margin-bottom:12px}
-.t3-1 .t3-pts{font-size:26px}
+.t3-1 .t3-pts{font-size:30px;font-weight:300}
 .t3-pts-1{color:var(--gold)}
 .t3-pts-2{color:var(--silver)}
 .t3-pts-3{color:var(--bronze)}
+.t3-line-1{height:3px}
 .t3-teams{display:flex;gap:6px;flex-wrap:wrap}
 .t3-team{font-size:11px;color:var(--tx2);background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:2px;padding:3px 8px}
 .t3-line{position:absolute;top:0;left:0;right:0;height:2px;border-radius:4px 4px 0 0}
@@ -58,17 +59,17 @@ body{background:var(--bg);color:var(--tx);font-family:'Inter',system-ui,-apple-s
 .tbl-wrap{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:12px}
 th{color:var(--tx3);font-weight:500;font-size:10px;text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:1px;background:var(--surface)}
-td{padding:9px 14px;border-bottom:1px solid var(--border);font-weight:400}
+td{padding:9px 14px;border-bottom:1px solid var(--border);font-weight:400;vertical-align:middle}
 tr:last-child td{border-bottom:none}
 .r-gold td{background:var(--gold2)}
 .r-silver td{background:var(--silver2)}
 .r-bronze td{background:var(--bronze2)}
-.rank{font-weight:600;font-size:11px;min-width:20px;display:inline-block}
+.rank{font-weight:600;font-size:11px;min-width:20px;display:inline-block;line-height:24px}
 .rank-1{color:var(--gold)}
 .rank-2{color:var(--silver)}
 .rank-3{color:var(--bronze)}
 .rank-n{color:var(--tx3)}
-.emp-name{display:flex;align-items:center;gap:8px}
+.emp-name{display:flex;align-items:center;gap:8px;white-space:nowrap}
 .ini{width:24px;height:24px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;letter-spacing:.5px;flex-shrink:0}
 .ini-1{background:var(--gold2);color:var(--gold)}
 .ini-2{background:var(--silver2);color:var(--silver)}
@@ -79,8 +80,8 @@ tr:last-child td{border-bottom:none}
 .pts-2{color:var(--silver)}
 .pts-3{color:var(--bronze)}
 .pts-n{color:var(--tx2)}
-.tm-chip{font-size:10px;color:var(--tx2);display:inline-flex;align-items:center;gap:3px}
-.tm-chip-wrap{display:flex;gap:8px;flex-wrap:wrap}
+.tm-chip{font-size:10px;color:var(--tx2);display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+td.tc{vertical-align:middle}
 .bar-w{display:flex;align-items:center;gap:8px}
 .bar{height:3px;border-radius:1px;display:inline-block}
 .picks-n{color:var(--tx3);font-size:11px;font-variant-numeric:tabular-nums}
@@ -297,9 +298,9 @@ function rEmp(){
     h+='<td><span class="rank '+rankCls(i)+'">'+(i+1)+'</span></td>';
     h+='<td><div class="emp-name"><span class="ini '+iniCls(i)+'">'+ini(e.name)+'</span>'+e.name+'</div></td>';
     h+='<td><span class="pts '+ptsCls(i)+'">'+e.pts+'</span></td>';
-    h+='<td class="tm-chip-wrap">'+tc(e.t1)+'</td>';
-    h+='<td class="tm-chip-wrap">'+tc(e.t2)+'</td>';
-    h+='<td class="tm-chip-wrap">'+tc(e.t3)+'</td>';
+    h+='<td class="tc">'+tc(e.t1)+'</td>';
+    h+='<td class="tc">'+tc(e.t2)+'</td>';
+    h+='<td class="tc">'+tc(e.t3)+'</td>';
     h+='</tr>';
   }
   h+='</tbody></table></div>';
