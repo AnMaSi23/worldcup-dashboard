@@ -92,8 +92,7 @@ td{padding:10px 12px;border-bottom:.5px solid var(--bd);background:var(--bg)}
 // ============================================================
 // Real-time endpoint (updates instantly when sheet changes)
 var CSV_REALTIME = "https://docs.google.com/spreadsheets/d/1dSL4yssLXRWh1KVHudYLptUJxY9xr4EeGNtJZHJ1K1Y/gviz/tq?tqx=out:csv&gid=139148033";
-// Published CSV (has 5-10 min cache delay)
-var CSV_PUBLISHED = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgSClAbj5LVtZp19FF6FcuRQTYRR3NzL4Bf5QDkIVYCEx7YGqUlv2vtmeIXiPAJKb025lharsd8unY/pub?gid=139148033&single=true&output=csv";
+// Only using realtime endpoint — no cached fallback
 var REFRESH = 60;
 
 // ============================================================
@@ -297,13 +296,7 @@ function tryF(url, label) {
 
 function fetchData() {
   var bust = "&_t=" + Date.now() + "&r=" + Math.random();
-  // Try real-time endpoint first, then published as fallback
   return tryF(CSV_REALTIME + bust, "Realtime").then(function(text) {
-    if (!text) {
-      return tryF(CSV_PUBLISHED + bust, "Published");
-    }
-    return text;
-  }).then(function(text) {
     if (!text) return null;
     var rows = pCSV(text);
     if (!rows.length) {
