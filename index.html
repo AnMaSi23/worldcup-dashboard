@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Cup 3 Nations Manager</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--bd:#21262d;--bd2:#30363d;--tx:#e6edf3;--mt:#7d8590;--bl:#58a6ff;--gd:#ffd700;--sv:#c0c0c0;--bz:#cd7f32}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;min-height:100vh}
+.hdr{border-bottom:1px solid var(--bd);padding:1.25rem 1.5rem 1rem;margin-bottom:1.5rem}
+.hdr-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.hdr h1{font-size:22px;font-weight:500}
+.hdr p{color:var(--mt);font-size:13px;margin-top:4px}
+.hdr-act{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.bg{font-size:11px;padding:3px 10px;border-radius:12px}
+.bg-live{background:rgba(59,109,17,.25);color:#7ee787;border:.5px solid rgba(59,109,17,.3)}
+.bg-err{background:rgba(248,81,73,.15);color:#f85149}
+.bg-fb{background:rgba(187,128,9,.2);color:#d29922;border:.5px solid rgba(187,128,9,.3)}
+.bg-t{background:var(--card);color:var(--mt);border:.5px solid var(--bd2);font-size:12px}
+.btn{background:var(--bd);color:#c9d1d9;border:.5px solid var(--bd2);border-radius:6px;padding:6px 14px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px}
+.btn:hover{background:var(--bd2)}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.sp{animation:spin 1s linear infinite;display:inline-block}
+.sec{padding:0 1.5rem;margin-bottom:2rem}
+.stl{color:var(--mt);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.pod{display:flex;align-items:flex-end;justify-content:center;gap:8px}
+.pcol{display:flex;flex-direction:column;align-items:center;flex:1;max-width:210px;min-width:100px}
+.pcard{background:var(--card);border-radius:10px;padding:1rem .5rem;text-align:center;width:100%;margin-bottom:6px}
+.pnm{color:var(--tx);font-weight:500;font-size:14px;margin:8px 0 2px}
+.ppt{font-weight:500;font-size:20px;margin-bottom:8px}
+.pbs{width:100%;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:22px}
+.av{border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:500;color:#fff;flex-shrink:0}
+.ch{display:inline-flex;align-items:center;gap:4px;background:var(--bd);border:.5px solid var(--bd2);border-radius:4px;padding:2px 7px;font-size:11px;color:#c9d1d9;margin:2px}
+.chs{display:flex;flex-wrap:wrap;justify-content:center}
+.tw{border:.5px solid var(--bd2);border-radius:10px;overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:500px}
+th{color:var(--mt);font-weight:500;font-size:12px;text-align:left;padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--bg)}
+td{padding:10px 12px;border-bottom:.5px solid var(--bd);background:var(--bg)}
+.rb{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:500;font-size:12px}
+.ec{display:flex;align-items:center;gap:8px}
+.bar{height:5px;border-radius:3px}
+.gr{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.scard{background:var(--card);border:.5px solid var(--bd2);border-radius:10px;padding:1rem 1.25rem}
+.shd{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.stms{border-top:.5px solid var(--bd);padding-top:10px;display:flex;flex-direction:column;gap:5px}
+.stm{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:6px;padding:5px 8px}
+.bsm{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:500;display:inline-block;margin:1px}
+.bpk{background:rgba(31,111,235,.2);color:var(--bl)}
+.bvl{background:rgba(59,109,17,.25);color:#7ee787}
+.dw{padding:0 1.5rem;margin-bottom:1rem}
+.dbtn{background:var(--card);color:var(--mt);border:.5px solid var(--bd2);border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer}
+.dlog{margin-top:8px;background:var(--card);border:.5px solid var(--bd2);border-radius:8px;padding:12px;max-height:200px;overflow:auto;font-size:11px;font-family:monospace;color:var(--mt);display:none}
+.dlog.open{display:block}
+.dok{color:#7ee787}
+.derr{color:#f85149}
+@media(max-width:600px){.sec{padding:0 1rem}.hdr{padding:1rem}table{min-width:380px;font-size:13px}.pcol{min-width:85px}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-row">
+    <div>
+      <h1>&#9917; World Cup 3 Nations Manager</h1>
+      <p>Office Fantasy Football &#8212; Live Dashboard</p>
+    </div>
+    <div class="hdr-act">
+      <span id="sBadge" class="bg bg-fb">Loading&#8230;</span>
+      <span id="tBadge" class="bg bg-t">Updated: &#8212;</span>
+      <button class="btn" onclick="go()">
+        <span id="rIco">&#8635;</span>
+        <span id="rTxt">Refresh</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="dw">
+  <button class="dbtn" onclick="tgDb()">Show debug log</button>
+  <div id="dLog" class="dlog"></div>
+</div>
+
+<div id="zPod" class="sec"></div>
+<div id="zEmp" class="sec"></div>
+<div id="zTm" class="sec"></div>
+<div id="zSq" class="sec"></div>
+
+<script>
+// ============================================================
+// CONFIG - Change your CSV URL here
+// ============================================================
+var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgSClAbj5LVtZp19FF6FcuRQTYRR3NzL4Bf5QDkIVYCEx7YGqUlv2vtmeIXiPAJKb025lharsd8unY/pub?gid=139148033&single=true&output=csv";
+var REFRESH = 60;
+
+// ============================================================
+// FLAGS
+// ============================================================
+var FL = {
+  "France":"🇫🇷","Norway":"🇳🇴","New Zealand":"🇳🇿","Spain":"🇪🇸",
+  "Belgium":"🇧🇪","Jordan":"🇯🇴","England":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Sweden":"🇸🇪",
+  "Panama":"🇵🇦","Czechia":"🇨🇿","Scotland":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","Haiti":"🇭🇹",
+  "Colombia":"🇨🇴","Cote d'Ivoire":"🇨🇮","Morocco":"🇲🇦",
+  "Brazil":"🇧🇷","Argentina":"🇦🇷","Germany":"🇩🇪","Portugal":"🇵🇹",
+  "Netherlands":"🇳🇱","Italy":"🇮🇹","Japan":"🇯🇵","USA":"🇺🇸",
+  "Mexico":"🇲🇽","Croatia":"🇭🇷","Denmark":"🇩🇰","Switzerland":"🇨🇭",
+  "Australia":"🇦🇺","Senegal":"🇸🇳","Uruguay":"🇺🇾","South Korea":"🇰🇷",
+  "Ghana":"🇬🇭","Cameroon":"🇨🇲","Nigeria":"🇳🇬","Ecuador":"🇪🇨",
+  "Tunisia":"🇹🇳","Poland":"🇵🇱","Serbia":"🇷🇸","Chile":"🇨🇱"
+};
+function ff(n) { return FL[n] || "🏳️"; }
+
+var AVC = ["#185FA5","#3B6D11","#3C3489","#993556","#0F6E56","#854F0B","#993C1D","#185FA5"];
+
+// ============================================================
+// FALLBACK DATA (from your actual sheet)
+// ============================================================
+var FBE = [
+  {name:"Gulli",points:8,team1:"France",team2:"Norway",team3:"New Zealand"},
+  {name:"Andri",points:0,team1:"Spain",team2:"Belgium",team3:"Jordan"},
+  {name:"Johnny",points:0,team1:"England",team2:"Sweden",team3:"Panama"},
+  {name:"Valdemar",points:0,team1:"Spain",team2:"Czechia",team3:"Scotland"},
+  {name:"Rabbi",points:0,team1:"Spain",team2:"Norway",team3:"Haiti"},
+  {name:"Gunni",points:0,team1:"Spain",team2:"Cote d'Ivoire",team3:"Scotland"},
+  {name:"Patrick",points:0,team1:"Spain",team2:"Morocco",team3:"Panama"},
+  {name:"Ari",points:0,team1:"Spain",team2:"Colombia",team3:"Jordan"}
+];
+var FBT = [
+  {name:"France",points:8,picked:1},{name:"Spain",points:0,picked:6},
+  {name:"Norway",points:0,picked:2},{name:"Jordan",points:0,picked:2},
+  {name:"Panama",points:0,picked:2},{name:"Scotland",points:0,picked:2},
+  {name:"New Zealand",points:0,picked:1},{name:"Belgium",points:0,picked:1},
+  {name:"England",points:0,picked:1},{name:"Sweden",points:0,picked:1},
+  {name:"Czechia",points:0,picked:1},{name:"Haiti",points:0,picked:1},
+  {name:"Colombia",points:0,picked:1},{name:"Cote d'Ivoire",points:0,picked:1},
+  {name:"Morocco",points:0,picked:1}
+];
+
+var emps = FBE;
+var tms = FBT;
+var logs = [];
+var dbOpen = false;
+var busy = false;
+
+// ============================================================
+// CSV PARSER
+// ============================================================
+function pCSV(text) {
+  var c = text.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  var lines = c.split("\n");
+  var clean = [];
+  for (var i = 0; i < lines.length; i++) {
+    var trimmed = lines[i].trim();
+    if (trimmed.length > 0) clean.push(trimmed);
+  }
+  if (clean.length < 2) return [];
+
+  function sp(line) {
+    var v = [];
+    var cur = "";
+    var q = false;
+    for (var i = 0; i < line.length; i++) {
+      var ch = line[i];
+      if (ch === '"') {
+        if (q && i + 1 < line.length && line[i + 1] === '"') {
+          cur += '"';
+          i++;
+        } else {
+          q = !q;
+        }
+      } else if (ch === ',' && !q) {
+        v.push(cur);
+        cur = "";
+      } else {
+        cur += ch;
+      }
+    }
+    v.push(cur);
+    var result = [];
+    for (var j = 0; j < v.length; j++) {
+      var s = v[j].trim();
+      if (s.length >= 2 && s[0] === '"' && s[s.length - 1] === '"') {
+        s = s.substring(1, s.length - 1);
+      }
+      result.push(s.trim());
+    }
+    return result;
+  }
+
+  var hdr = sp(clean[0]);
+  var rows = [];
+  for (var i = 1; i < clean.length; i++) {
+    var vals = sp(clean[i]);
+    var obj = {};
+    for (var j = 0; j < hdr.length; j++) {
+      if (hdr[j]) obj[hdr[j]] = vals[j] || "";
+    }
+    rows.push(obj);
+  }
+  return rows;
+}
+
+// ============================================================
+// DATA EXTRACTION
+// ============================================================
+function extract(rows) {
+  var emp = [];
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    if (r["Employee"] && r["Employee"].length > 0) {
+      emp.push({
+        name: r["Employee"],
+        points: parseFloat(r["Total Points"]) || 0,
+        team1: r["Team 1"] || "—",
+        team2: r["Team 2"] || "—",
+        team3: r["Team 3"] || "—"
+      });
+    }
+  }
+  emp.sort(function(a, b) {
+    return b.points - a.points || a.name.localeCompare(b.name);
+  });
+
+  var picks = {};
+  for (var i = 0; i < emp.length; i++) {
+    var teams = [emp[i].team1, emp[i].team2, emp[i].team3];
+    for (var j = 0; j < teams.length; j++) {
+      var t = teams[j];
+      if (t && t !== "—") picks[t] = (picks[t] || 0) + 1;
+    }
+  }
+
+  var tm = [];
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    if (r["Team"] && r["Team"].length > 0) {
+      tm.push({
+        name: r["Team"],
+        points: parseFloat(r["Points"]) || 0,
+        picked: picks[r["Team"]] || 0
+      });
+    }
+  }
+  tm.sort(function(a, b) {
+    return b.points - a.points || a.name.localeCompare(b.name);
+  });
+
+  return { employees: emp, teams: tm };
+}
+
+// ============================================================
+// FETCH WITH FALLBACKS
+// ============================================================
+function aLog(msg, ok) {
+  var ts = new Date().toLocaleTimeString();
+  logs.push({ m: ts + " — " + msg, ok: ok });
+  var el = document.getElementById("dLog");
+  var html = "";
+  for (var i = 0; i < logs.length; i++) {
+    html += '<div class="' + (logs[i].ok ? "dok" : "derr") + '">' + logs[i].m + '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function tgDb() {
+  dbOpen = !dbOpen;
+  var el = document.getElementById("dLog");
+  if (dbOpen) { el.classList.add("open"); } else { el.classList.remove("open"); }
+}
+
+function tryF(url, label) {
+  return fetch(url, { cache: "no-store" }).then(function(r) {
+    if (!r.ok) {
+      aLog(label + ": HTTP " + r.status, false);
+      return null;
+    }
+    return r.text().then(function(t) {
+      if (t.indexOf("<!DOCTYPE") >= 0 || t.indexOf("<html") >= 0) {
+        aLog(label + ": Got HTML not CSV", false);
+        return null;
+      }
+      if (t.length < 20) {
+        aLog(label + ": Too short (" + t.length + ")", false);
+        return null;
+      }
+      aLog(label + ": Got " + t.length + " chars", true);
+      return t;
+    });
+  }).catch(function(e) {
+    aLog(label + ": " + e.message, false);
+    return null;
+  });
+}
+
+function fetchData() {
+  var t = Date.now();
+  var urls = [
+    [CSV_URL + "&_t=" + t, "Direct"],
+    ["https://api.allorigins.win/raw?url=" + encodeURIComponent(CSV_URL), "allorigins"],
+    ["https://corsproxy.io/?url=" + encodeURIComponent(CSV_URL), "corsproxy"]
+  ];
+
+  var idx = 0;
+  function tryNext() {
+    if (idx >= urls.length) return Promise.resolve(null);
+    var url = urls[idx][0];
+    var label = urls[idx][1];
+    idx++;
+    return tryF(url, label).then(function(text) {
+      if (!text) return tryNext();
+      var rows = pCSV(text);
+      if (!rows.length) {
+        aLog(label + ": 0 rows after parse", false);
+        return tryNext();
+      }
+      aLog("Parsed " + rows.length + " rows. Keys: " + Object.keys(rows[0]).join(", "), true);
+      var data = extract(rows);
+      if (data.employees.length > 0) {
+        aLog("Found " + data.employees.length + " employees, " + data.teams.length + " teams", true);
+        return data;
+      }
+      aLog("No 'Employee' column found", false);
+      return tryNext();
+    });
+  }
+  return tryNext();
+}
+
+// ============================================================
+// RENDER HELPERS
+// ============================================================
+function av(name, idx, sz) {
+  var ini = name.split(" ").map(function(w) { return w[0]; }).join("").toUpperCase().slice(0, 2);
+  return '<div class="av" style="width:' + sz + 'px;height:' + sz + 'px;background:' + AVC[idx % AVC.length] + ';font-size:' + (sz > 38 ? 14 : 11) + 'px">' + ini + '</div>';
+}
+function ch(t) { return '<span class="ch">' + ff(t) + ' ' + t + '</span>'; }
+function chs(e) { return '<div class="chs">' + ch(e.team1) + ch(e.team2) + ch(e.team3) + '</div>'; }
+function rb(i) {
+  var c = i === 0 ? "var(--gd)" : i === 1 ? "var(--sv)" : i === 2 ? "var(--bz)" : "#6e7681";
+  var bg = i === 0 ? "rgba(255,215,0,.15)" : i === 1 ? "rgba(192,192,192,.15)" : i === 2 ? "rgba(205,127,50,.15)" : "transparent";
+  return '<span class="rb" style="background:' + bg + ';color:' + c + '">' + (i + 1) + '</span>';
+}
+function pc(i) { return i === 0 ? "var(--gd)" : i === 1 ? "var(--sv)" : i === 2 ? "var(--bz)" : "var(--bl)"; }
+
+// ============================================================
+// RENDER SECTIONS
+// ============================================================
+function rPod() {
+  var el = document.getElementById("zPod");
+  if (emps.length < 3) { el.innerHTML = ""; return; }
+  var crowns = ["🥇","🥈","🥉"];
+  var colors = ["var(--gd)","var(--sv)","var(--bz)"];
+  var hts = ["120px","85px","65px"];
+  var bds = ["1px solid rgba(255,215,0,.35)","1px solid rgba(192,192,192,.25)","1px solid rgba(205,127,50,.25)"];
+  var bbg = ["rgba(255,215,0,.1)","rgba(192,192,192,.08)","rgba(205,127,50,.08)"];
+  var order = [1, 0, 2];
+  var h = '<div class="stl">Top 3 podium</div><div class="pod">';
+  for (var x = 0; x < order.length; x++) {
+    var rank = order[x];
+    var e = emps[rank];
+    h += '<div class="pcol">';
+    h += '<div class="pcard" style="border:' + bds[rank] + '">';
+    h += '<div style="font-size:24px;margin-bottom:6px">' + crowns[rank] + '</div>';
+    h += av(e.name, rank, 44);
+    h += '<div class="pnm">' + e.name + '</div>';
+    h += '<div class="ppt" style="color:' + colors[rank] + '">' + e.points + ' pts</div>';
+    h += chs(e);
+    h += '</div>';
+    h += '<div class="pbs" style="height:' + hts[rank] + ';background:' + bbg[rank] + ';color:' + colors[rank] + '">' + (rank + 1) + '</div>';
+    h += '</div>';
+  }
+  h += '</div>';
+  el.innerHTML = h;
+}
+
+function rEmp() {
+  var h = '<div class="stl">Employee leaderboard</div><div class="tw"><table>';
+  h += '<thead><tr><th>#</th><th>Employee</th><th>Points</th><th>Team 1</th><th>Team 2</th><th>Team 3</th></tr></thead><tbody>';
+  for (var i = 0; i < emps.length; i++) {
+    var e = emps[i];
+    var bg = i < 3 ? ["#16213a","#131b2e","#141e23"][i] : "var(--bg)";
+    h += '<tr>';
+    h += '<td style="background:' + bg + '">' + rb(i) + '</td>';
+    h += '<td style="background:' + bg + '"><div class="ec">' + av(e.name, i, 28) + '<span>' + e.name + '</span></div></td>';
+    h += '<td style="background:' + bg + ';font-weight:500;color:' + pc(i) + '">' + e.points + '</td>';
+    h += '<td style="background:' + bg + '">' + ch(e.team1) + '</td>';
+    h += '<td style="background:' + bg + '">' + ch(e.team2) + '</td>';
+    h += '<td style="background:' + bg + '">' + ch(e.team3) + '</td>';
+    h += '</tr>';
+  }
+  h += '</tbody></table></div>';
+  document.getElementById("zEmp").innerHTML = h;
+}
+
+function rTm() {
+  var el = document.getElementById("zTm");
+  if (!tms.length) { el.innerHTML = ""; return; }
+  var mxPt = 1;
+  var mxPk = 1;
+  for (var i = 0; i < tms.length; i++) {
+    if (tms[i].points > mxPt) mxPt = tms[i].points;
+    if (tms[i].picked > mxPk) mxPk = tms[i].picked;
+  }
+  var mp = tms[0].name;
+  for (var i = 1; i < tms.length; i++) {
+    if (tms[i].picked > tms[0].picked) mp = tms[i].name;
+  }
+  var bestMp = tms[0];
+  for (var i = 1; i < tms.length; i++) {
+    if (tms[i].picked > bestMp.picked) bestMp = tms[i];
+  }
+  mp = bestMp.name;
+
+  var bv = null;
+  var bestRatio = -1;
+  for (var i = 0; i < tms.length; i++) {
+    if (tms[i].picked > 0 && tms[i].points > 0) {
+      var ratio = tms[i].points / tms[i].picked;
+      if (ratio > bestRatio) { bestRatio = ratio; bv = tms[i].name; }
+    }
+  }
+
+  var h = '<div class="stl">Team leaderboard</div><div class="tw"><table>';
+  h += '<thead><tr><th>#</th><th>Team</th><th>Points</th><th>Picks</th><th></th></tr></thead><tbody>';
+  for (var i = 0; i < tms.length; i++) {
+    var t = tms[i];
+    var ptW = mxPt > 0 ? Math.round((t.points / mxPt) * 80) : 0;
+    var pkW = Math.round((t.picked / mxPk) * 60);
+    var badges = "";
+    if (t.name === mp) badges += '<span class="bsm bpk">Most picked</span> ';
+    if (t.name === bv) badges += '<span class="bsm bvl">Best value</span>';
+    h += '<tr>';
+    h += '<td>' + rb(i) + '</td>';
+    h += '<td>' + ff(t.name) + ' ' + t.name + '</td>';
+    h += '<td style="font-weight:500;color:' + pc(i) + '"><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:' + ptW + 'px;background:' + (i === 0 ? "var(--gd)" : "#1f6feb") + ';min-width:' + (t.points > 0 ? 4 : 0) + 'px"></div>' + t.points + '</div></td>';
+    h += '<td><div style="display:flex;align-items:center;gap:6px"><div class="bar" style="width:' + pkW + 'px;background:var(--bd2);min-width:' + (t.picked > 0 ? 4 : 0) + 'px"></div><span style="color:var(--mt);font-size:12px">' + t.picked + '</span></div></td>';
+    h += '<td>' + badges + '</td>';
+    h += '</tr>';
+  }
+  h += '</tbody></table></div>';
+  el.innerHTML = h;
+}
+
+function rSq() {
+  var h = '<div class="stl">Employee squad cards</div><div class="gr">';
+  for (var i = 0; i < emps.length; i++) {
+    var e = emps[i];
+    h += '<div class="scard"><div class="shd">';
+    h += av(e.name, i, 36);
+    h += '<div><div style="font-weight:500;font-size:14px">' + e.name + '</div>';
+    h += '<div style="color:var(--mt);font-size:12px">' + e.points + ' pts</div></div></div>';
+    h += '<div class="stms">';
+    var t3 = [e.team1, e.team2, e.team3];
+    for (var j = 0; j < t3.length; j++) {
+      h += '<div class="stm"><span style="font-size:16px">' + ff(t3[j]) + '</span><span style="color:#c9d1d9;font-size:13px">' + t3[j] + '</span></div>';
+    }
+    h += '</div></div>';
+  }
+  h += '</div>';
+  document.getElementById("zSq").innerHTML = h;
+}
+
+function renderAll() { rPod(); rEmp(); rTm(); rSq(); }
+
+// ============================================================
+// STATUS + REFRESH
+// ============================================================
+function setSt(cls, txt) {
+  var el = document.getElementById("sBadge");
+  el.className = "bg " + cls;
+  el.textContent = txt;
+}
+function setTm() {
+  document.getElementById("tBadge").textContent = "Updated: " + new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit", second:"2-digit"});
+}
+
+function go() {
+  if (busy) return;
+  busy = true;
+  logs = [];
+  document.getElementById("dLog").innerHTML = "";
+  document.getElementById("rIco").classList.add("sp");
+  document.getElementById("rTxt").textContent = "Refreshing...";
+
+  fetchData().then(function(data) {
+    if (data) {
+      emps = data.employees;
+      tms = data.teams;
+      setSt("bg-live", "Live ✓");
+    } else {
+      setSt("bg-err", "Fetch failed — see debug");
+    }
+    setTm();
+    renderAll();
+    document.getElementById("rIco").classList.remove("sp");
+    document.getElementById("rTxt").textContent = "Refresh";
+    busy = false;
+  });
+}
+
+renderAll();
+go();
+setInterval(go, REFRESH * 1000);
+</script>
+</body>
+</html>
