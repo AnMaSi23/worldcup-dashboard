@@ -105,12 +105,31 @@ function log(msg,ok){
 // EXTRACT DATA FROM JSON ROWS
 // =============================================
 function process(rows){
+  // Find actual key names (handles extra spaces)
+  var keys = Object.keys(rows[0]);
+  function findKey(target) {
+    for (var i = 0; i < keys.length; i++) {
+      if (keys[i].trim() === target) return keys[i];
+    }
+    for (var i = 0; i < keys.length; i++) {
+      if (keys[i].replace(/\s+/g," ").trim() === target) return keys[i];
+    }
+    return target;
+  }
+  var kEmp = findKey("Employee");
+  var kT1 = findKey("Team 1");
+  var kT2 = findKey("Team 2");
+  var kT3 = findKey("Team 3");
+  var kPts = findKey("Total Points");
+  var kTm = findKey("Team");
+  var kTmP = findKey("Points");
+
   var e=[];
   for(var i=0;i<rows.length;i++){
     var r=rows[i];
-    if(r["Employee"]&&String(r["Employee"]).length>0){
-      e.push({name:String(r["Employee"]),pts:parseFloat(r["Total Points"])||0,
-        t1:String(r["Team 1"]||"--"),t2:String(r["Team 2"]||"--"),t3:String(r["Team 3"]||"--")});
+    if(r[kEmp]&&String(r[kEmp]).length>0){
+      e.push({name:String(r[kEmp]),pts:parseFloat(r[kPts])||0,
+        t1:String(r[kT1]||"--"),t2:String(r[kT2]||"--"),t3:String(r[kT3]||"--")});
     }
   }
   e.sort(function(a,b){return b.pts-a.pts||a.name.localeCompare(b.name)});
@@ -124,8 +143,8 @@ function process(rows){
   var tm=[];
   for(var i=0;i<rows.length;i++){
     var r=rows[i];
-    if(r["Team"]&&String(r["Team"]).length>0){
-      tm.push({name:String(r["Team"]),pts:parseFloat(r["Points"])||0,pk:pk[String(r["Team"])]||0});
+    if(r[kTm]&&String(r[kTm]).length>0){
+      tm.push({name:String(r[kTm]),pts:parseFloat(r[kTmP])||0,pk:pk[String(r[kTm])]||0});
     }
   }
   tm.sort(function(a,b){return b.pts-a.pts||a.name.localeCompare(b.name)});
@@ -152,6 +171,7 @@ function load(){
   })
   .then(function(rows){
     log("Got "+rows.length+" rows",true);
+    log("Keys: "+Object.keys(rows[0]).join(" | "),true);
     var d=process(rows);
     log("Employees: "+d.emps.length+", Teams: "+d.teams.length,true);
     if(d.emps.length>0){
