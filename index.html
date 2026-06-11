@@ -91,7 +91,7 @@ td{padding:10px 12px;border-bottom:.5px solid var(--bd);background:var(--bg)}
 // CONFIG - Change your CSV URL here
 // ============================================================
 // Real-time endpoint (updates instantly when sheet changes)
-var CSV_REALTIME = "https://docs.google.com/spreadsheets/d/1dSL4yssLXRWh1KVHudYLptUJxY9xr4EeGNtJZHJ1K1Y/gviz/tq?tqx=out:csv&gid=139148033";
+var CSV_REALTIME = "https://docs.google.com/spreadsheets/d/1dSL4yssLXRWh1KVHudYLptUJxY9xr4EeGNtJZHJ1K1Y/export?format=csv&gid=139148033";
 // Only using realtime endpoint — no cached fallback
 var REFRESH = 60;
 
@@ -271,7 +271,10 @@ function tgDb() {
 }
 
 function tryF(url, label) {
-  return fetch(url, { cache: "no-store" }).then(function(r) {
+  return fetch(url, {
+    cache: "no-store",
+    headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" }
+  }).then(function(r) {
     if (!r.ok) {
       aLog(label + ": HTTP " + r.status, false);
       return null;
@@ -295,7 +298,7 @@ function tryF(url, label) {
 }
 
 function fetchData() {
-  var bust = "&_t=" + Date.now() + "&r=" + Math.random();
+  var bust = "&nocache=" + Date.now() + "" + Math.floor(Math.random()*999999);
   return tryF(CSV_REALTIME + bust, "Realtime").then(function(text) {
     if (!text) return null;
     var rows = pCSV(text);
