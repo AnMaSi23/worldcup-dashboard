@@ -293,37 +293,23 @@ function tryF(url, label) {
 }
 
 function fetchData() {
-  var t = Date.now();
-  var urls = [
-    [CSV_URL + "&_t=" + t, "Direct"],
-    ["https://api.allorigins.win/raw?url=" + encodeURIComponent(CSV_URL), "allorigins"],
-    ["https://corsproxy.io/?url=" + encodeURIComponent(CSV_URL), "corsproxy"]
-  ];
-
-  var idx = 0;
-  function tryNext() {
-    if (idx >= urls.length) return Promise.resolve(null);
-    var url = urls[idx][0];
-    var label = urls[idx][1];
-    idx++;
-    return tryF(url, label).then(function(text) {
-      if (!text) return tryNext();
-      var rows = pCSV(text);
-      if (!rows.length) {
-        aLog(label + ": 0 rows after parse", false);
-        return tryNext();
-      }
-      aLog("Parsed " + rows.length + " rows. Keys: " + Object.keys(rows[0]).join(", "), true);
-      var data = extract(rows);
-      if (data.employees.length > 0) {
-        aLog("Found " + data.employees.length + " employees, " + data.teams.length + " teams", true);
-        return data;
-      }
-      aLog("No 'Employee' column found", false);
-      return tryNext();
-    });
-  }
-  return tryNext();
+  var url = CSV_URL + "&_t=" + Date.now() + "&r=" + Math.random();
+  return tryF(url, "Direct").then(function(text) {
+    if (!text) return null;
+    var rows = pCSV(text);
+    if (!rows.length) {
+      aLog("0 rows after parse", false);
+      return null;
+    }
+    aLog("Parsed " + rows.length + " rows. Keys: " + Object.keys(rows[0]).join(", "), true);
+    var data = extract(rows);
+    if (data.employees.length > 0) {
+      aLog("Found " + data.employees.length + " employees, " + data.teams.length + " teams", true);
+      return data;
+    }
+    aLog("No 'Employee' column found", false);
+    return null;
+  });
 }
 
 // ============================================================
