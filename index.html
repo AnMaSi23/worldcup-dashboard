@@ -90,9 +90,7 @@ td{padding:10px 12px;border-bottom:.5px solid var(--bd);background:var(--bg)}
 // ============================================================
 // CONFIG - Change your CSV URL here
 // ============================================================
-// Real-time endpoint (updates instantly when sheet changes)
-var CSV_REALTIME = "https://docs.google.com/spreadsheets/d/1dSL4yssLXRWh1KVHudYLptUJxY9xr4EeGNtJZHJ1K1Y/export?format=csv&gid=139148033";
-// Only using realtime endpoint — no cached fallback
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPvjoW4i7y0CFfWb1Y30K1TaRzhMznDN-xsoJjoAhWCzHbtQ_BmU0JPaB0p0y_ASM4/exec";
 var REFRESH = 60;
 
 // ============================================================
@@ -298,21 +296,22 @@ function tryF(url, label) {
 }
 
 function fetchData() {
-  var bust = "&nocache=" + Date.now() + "" + Math.floor(Math.random()*999999);
-  return tryF(CSV_REALTIME + bust, "Realtime").then(function(text) {
-    if (!text) return null;
-    var rows = pCSV(text);
-    if (!rows.length) {
-      aLog("0 rows after parse", false);
-      return null;
-    }
-    aLog("Parsed " + rows.length + " rows. Keys: " + Object.keys(rows[0]).join(", "), true);
+  var url = SCRIPT_URL + "?nocache=" + Date.now() + Math.floor(Math.random()*999999);
+  return fetch(url, { cache: "no-store" }).then(function(r) {
+    if (!r.ok) { aLog("HTTP " + r.status, false); return null; }
+    return r.json();
+  }).then(function(rows) {
+    if (!rows || !rows.length) { aLog("No data returned", false); return null; }
+    aLog("Got " + rows.length + " rows from Apps Script", true);
     var data = extract(rows);
     if (data.employees.length > 0) {
       aLog("Found " + data.employees.length + " employees, " + data.teams.length + " teams", true);
       return data;
     }
-    aLog("No 'Employee' column found", false);
+    aLog("No 'Employee' column found. Keys: " + Object.keys(rows[0]).join(", "), false);
+    return null;
+  }).catch(function(e) {
+    aLog("Fetch error: " + e.message, false);
     return null;
   });
 }
