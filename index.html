@@ -86,7 +86,17 @@ td.tc{vertical-align:middle}
 .bar{height:3px;border-radius:1px;display:inline-block}
 .picks-n{color:var(--tx3);font-size:11px;font-variant-numeric:tabular-nums}
 
-/* Squad Cards */
+/* Rules */
+.rules{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:.85rem 1rem}
+.rules-hdr{font-size:10px;color:var(--tx3);font-weight:500;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.rules-grid{display:grid;grid-template-columns:1fr auto;row-gap:6px;column-gap:16px}
+.rules-lbl{font-size:11px;color:var(--tx2);font-weight:400}
+.rules-val{font-size:11px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;letter-spacing:.3px}
+.rules-pos{color:var(--gold)}
+.rules-neg{color:#a66}
+.rules-note{font-weight:400;color:var(--tx3);font-size:10px}
+
+/* Debug */
 .gr{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
 .sc{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:.9rem 1rem}
 .sc-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
@@ -146,6 +156,19 @@ td.tc{vertical-align:middle}
   <div>
     <div class="sec-title">Team Standings</div>
     <div id="s3"></div>
+    <div class="rules" style="margin-top:12px">
+      <div class="rules-hdr">Scoring Rules</div>
+      <div class="rules-grid">
+        <span class="rules-lbl">Group stage win</span><span class="rules-val rules-pos">+3</span>
+        <span class="rules-lbl">Group stage draw</span><span class="rules-val rules-pos">+1</span>
+        <span class="rules-lbl">Goal scored</span><span class="rules-val rules-pos">+1<span class="rules-note"> / goal</span></span>
+        <span class="rules-lbl">Clean sheet</span><span class="rules-val rules-pos">+2</span>
+        <span class="rules-lbl">Hat-trick by a player</span><span class="rules-val rules-pos">+2</span>
+        <span class="rules-lbl">Penalty shootout win</span><span class="rules-val rules-pos">+2</span>
+        <span class="rules-lbl">Loss by 3+ goals</span><span class="rules-val rules-neg">&minus;2</span>
+        <span class="rules-lbl">Red card</span><span class="rules-val rules-neg">&minus;3</span>
+      </div>
+    </div>
   </div>
 </div>
 
