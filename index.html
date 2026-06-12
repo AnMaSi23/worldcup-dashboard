@@ -86,15 +86,20 @@ td.tc{vertical-align:middle}
 .bar{height:3px;border-radius:1px;display:inline-block}
 .picks-n{color:var(--tx3);font-size:11px;font-variant-numeric:tabular-nums}
 
-/* Rules */
-.rules{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:.85rem 1rem}
-.rules-hdr{font-size:10px;color:var(--tx3);font-weight:500;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
-.rules-grid{display:grid;grid-template-columns:1fr auto;row-gap:6px;column-gap:16px}
-.rules-lbl{font-size:11px;color:var(--tx2);font-weight:400}
-.rules-val{font-size:11px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;letter-spacing:.3px}
+/* Rules Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:1.5rem 1.75rem;width:340px;max-width:90vw;position:relative}
+.modal-title{font-size:12px;color:var(--tx3);font-weight:500;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px}
+.modal-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer;padding:4px;line-height:1}
+.modal-close:hover{color:var(--tx)}
+.rules-grid{display:grid;grid-template-columns:1fr auto;row-gap:8px;column-gap:20px}
+.rules-lbl{font-size:12px;color:var(--tx2);font-weight:400}
+.rules-val{font-size:12px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;letter-spacing:.3px}
 .rules-pos{color:var(--gold)}
 .rules-neg{color:#a66}
 .rules-note{font-weight:400;color:var(--tx3);font-size:10px}
+.rules-div{grid-column:1/-1;height:1px;background:var(--border);margin:4px 0}
 
 /* Debug */
 .gr{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
@@ -137,6 +142,7 @@ td.tc{vertical-align:middle}
   <div class="hdr-r">
     <span id="pill" class="pill pill-wait">Connecting</span>
     <span id="clock" class="pill-t">--:--</span>
+    <button class="btn" onclick="toggleRules()">Rules</button>
     <button class="btn" onclick="load()"><span id="ico">&#8635;</span><span id="btx">Refresh</span></button>
   </div>
 </header>
@@ -177,6 +183,25 @@ td.tc{vertical-align:middle}
 
 </div>
 
+<div id="rulesModal" class="modal-overlay" onclick="if(event.target===this)toggleRules()">
+  <div class="modal">
+    <button class="modal-close" onclick="toggleRules()">&times;</button>
+    <div class="modal-title">Scoring Rules</div>
+    <div class="rules-grid">
+      <span class="rules-lbl">Group stage win</span><span class="rules-val rules-pos">+3</span>
+      <span class="rules-lbl">Group stage draw</span><span class="rules-val rules-pos">+1</span>
+      <div class="rules-div"></div>
+      <span class="rules-lbl">Goal scored</span><span class="rules-val rules-pos">+1<span class="rules-note"> / goal</span></span>
+      <span class="rules-lbl">Clean sheet</span><span class="rules-val rules-pos">+2</span>
+      <span class="rules-lbl">Hat-trick by a player</span><span class="rules-val rules-pos">+2</span>
+      <span class="rules-lbl">Penalty shootout win</span><span class="rules-val rules-pos">+2</span>
+      <div class="rules-div"></div>
+      <span class="rules-lbl">Loss by 3+ goals</span><span class="rules-val rules-neg">&minus;2</span>
+      <span class="rules-lbl">Red card</span><span class="rules-val rules-neg">&minus;3</span>
+    </div>
+  </div>
+</div>
+
 <script>
 var API = "https://script.google.com/macros/s/AKfycbyJ0KhGIHFFyWHU6G6NtsPvRwPXAXIdfQDoT_BgTkYq2eLQI6D4PriiuGJjinxauDzh/exec";
 var REFRESH = 60;
@@ -195,6 +220,10 @@ var FB=[
 ];
 
 var emps=FB.slice(),teamsData=[],logs=[],busy=false;
+
+function toggleRules(){
+  document.getElementById("rulesModal").classList.toggle("open");
+}
 
 function log(msg,ok){
   var t=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"});
