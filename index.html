@@ -86,6 +86,14 @@ td.tc{vertical-align:middle}
 .bar{height:3px;border-radius:1px;display:inline-block}
 .picks-n{color:var(--tx3);font-size:11px;font-variant-numeric:tabular-nums}
 
+/* Match Points */
+.mc{text-align:center;min-width:52px;padding:7px 8px !important}
+.mc-date{font-size:9px;color:var(--tx3);letter-spacing:.2px;white-space:nowrap;display:block;margin-bottom:1px}
+.mc-pts{font-size:12px;font-weight:500;color:var(--tx);font-variant-numeric:tabular-nums}
+.mc-blank{font-size:11px;color:var(--tx3);opacity:.35}
+.mc-total{font-weight:600;color:var(--gold)}
+.mc-hdr{font-size:9px !important;text-align:center;letter-spacing:.5px;padding:8px 6px !important;white-space:nowrap}
+
 /* Rules Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center}
 .modal-overlay.open{display:flex}
@@ -168,6 +176,9 @@ td.tc{vertical-align:middle}
 <div class="sec-title">Squads</div>
 <div id="s4"></div>
 
+<div class="sec-title" style="margin-top:2rem">Team Match Points</div>
+<div id="s5"></div>
+
 </div>
 
 <div id="rulesModal" class="modal-overlay" onclick="if(event.target===this)toggleRules()">
@@ -191,6 +202,7 @@ td.tc{vertical-align:middle}
 
 <script>
 var API = "https://script.google.com/macros/s/AKfycbyJ0KhGIHFFyWHU6G6NtsPvRwPXAXIdfQDoT_BgTkYq2eLQI6D4PriiuGJjinxauDzh/exec";
+var MATCH_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgSClAbj5LVtZp19FF6FcuRQTYRR3NzL4Bf5QDkIVYCEx7YGqUlv2vtmeIXiPAJKb025lharsd8unY/pub?gid=1423306191&single=true&output=csv";
 var REFRESH = 60;
 var FL={"France":"\u{1F1EB}\u{1F1F7}","Norway":"\u{1F1F3}\u{1F1F4}","New Zealand":"\u{1F1F3}\u{1F1FF}","Spain":"\u{1F1EA}\u{1F1F8}","Belgium":"\u{1F1E7}\u{1F1EA}","Jordan":"\u{1F1EF}\u{1F1F4}","England":"\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}","Sweden":"\u{1F1F8}\u{1F1EA}","Panama":"\u{1F1F5}\u{1F1E6}","Czechia":"\u{1F1E8}\u{1F1FF}","Scotland":"\u{1F3F4}\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}","Haiti":"\u{1F1ED}\u{1F1F9}","Colombia":"\u{1F1E8}\u{1F1F4}","Cote d'Ivoire":"\u{1F1E8}\u{1F1EE}","Morocco":"\u{1F1F2}\u{1F1E6}","Brazil":"\u{1F1E7}\u{1F1F7}","Argentina":"\u{1F1E6}\u{1F1F7}","Germany":"\u{1F1E9}\u{1F1EA}","Portugal":"\u{1F1F5}\u{1F1F9}","Netherlands":"\u{1F1F3}\u{1F1F1}","Italy":"\u{1F1EE}\u{1F1F9}","Japan":"\u{1F1EF}\u{1F1F5}"};
 function fg(n){return FL[n]||"\u{1F3F3}\u{FE0F}"}
@@ -206,7 +218,30 @@ var FB=[
 {name:"Ari",pts:0,t1:"Spain",t2:"Colombia",t3:"Jordan"}
 ];
 
-var emps=FB.slice(),teamsData=[],logs=[],busy=false;
+var emps=FB.slice(),teamsData=[],matchPts=[],logs=[],busy=false;
+
+// CSV parser for match points
+function parseCSV(text){
+  var c=text.replace(/^\uFEFF/,"").replace(/\r\n/g,"\n").replace(/\r/g,"\n");
+  var lines=c.split("\n");var clean=[];
+  for(var i=0;i<lines.length;i++){var t=lines[i].trim();if(t.length>0)clean.push(t)}
+  if(clean.length<2)return[];
+  function sp(line){
+    var v=[],cur="",q=false;
+    for(var i=0;i<line.length;i++){
+      var ch=line[i];
+      if(ch==='"'){if(q&&i+1<line.length&&line[i+1]==='"'){cur+='"';i++}else q=!q}
+      else if(ch===','&&!q){v.push(cur);cur=""}else cur+=ch;
+    }v.push(cur);
+    var r=[];for(var j=0;j<v.length;j++){var s=v[j].trim();if(s.length>=2&&s[0]==='"'&&s[s.length-1]==='"')s=s.substring(1,s.length-1);r.push(s.trim())}return r;
+  }
+  var hdr=sp(clean[0]);var rows=[];
+  for(var i=1;i<clean.length;i++){
+    var vals=sp(clean[i]);var obj={};
+    for(var j=0;j<hdr.length;j++){if(hdr[j])obj[hdr[j]]=vals[j]||""}
+    rows.push(obj);
+  }return rows;
+}
 
 function toggleRules(){
   document.getElementById("rulesModal").classList.toggle("open");
@@ -262,9 +297,9 @@ function load(){
   document.getElementById("btx").textContent="...";
   log("Fetching data",true);
 
-  fetch(API+"?t="+Date.now(),{redirect:"follow"})
+  var mainFetch = fetch(API+"?t="+Date.now(),{redirect:"follow"})
   .then(function(r){
-    log("HTTP "+r.status,r.ok);
+    log("Main: HTTP "+r.status,r.ok);
     if(!r.ok)throw new Error("HTTP "+r.status);
     return r.json();
   })
@@ -282,9 +317,29 @@ function load(){
     }
   })
   .catch(function(err){
-    log("Error: "+err.message,false);
+    log("Main error: "+err.message,false);
     setPill("pill-err","Offline");
+  });
+
+  var matchFetch = fetch(MATCH_CSV+"&_t="+Date.now(),{cache:"no-store"})
+  .then(function(r){
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    return r.text();
   })
+  .then(function(text){
+    var rows=parseCSV(text);
+    if(rows.length>0){
+      matchPts=rows;
+      log("Match points: "+rows.length+" teams",true);
+    } else {
+      log("Match CSV: no rows",false);
+    }
+  })
+  .catch(function(err){
+    log("Match CSV: "+err.message,false);
+  });
+
+  Promise.all([mainFetch,matchFetch])
   .finally(function(){
     render();
     document.getElementById("clock").textContent=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
@@ -384,7 +439,72 @@ function rSq(){
   h+='</div>';document.getElementById("s4").innerHTML=h;
 }
 
-function render(){rTop();rEmp();rTm();rSq()}
+// ── Match Points ──
+function rMatch(){
+  var el=document.getElementById("s5");
+  if(!matchPts.length){el.innerHTML='';return}
+
+  // Find column keys flexibly
+  var keys=Object.keys(matchPts[0]);
+  function fk(t){
+    for(var i=0;i<keys.length;i++){if(keys[i].trim()===t)return keys[i]}
+    for(var i=0;i<keys.length;i++){if(keys[i].replace(/\s+/g," ").trim()===t)return keys[i]}
+    return t;
+  }
+  var kTeam=fk("Team"),kG1=fk("Game 1"),kD1=fk("Date 1"),kP1=fk("Points 1"),
+      kG2=fk("Game 2"),kD2=fk("Date 2"),kP2=fk("Points 2"),
+      kG3=fk("Game 3"),kD3=fk("Date 3"),kP3=fk("Points 3"),
+      kR32=fk("32 teams"),kR16=fk("16 teams"),kQF=fk("Quarterfinals"),
+      kSF=fk("Semifinals"),kFI=fk("Final"),k3rd=fk("3rd Place"),kTot=fk("Total");
+
+  function cell(pts,date){
+    if(pts===""||pts===null||pts===undefined){
+      if(date&&date.length>0) return '<span class="mc-date">'+date+'</span><span class="mc-blank">&mdash;</span>';
+      return '<span class="mc-blank">&mdash;</span>';
+    }
+    var n=parseFloat(pts);
+    var out='';
+    if(date&&date.length>0) out+='<span class="mc-date">'+date+'</span>';
+    out+='<span class="mc-pts">'+n+'</span>';
+    return out;
+  }
+  function cellSimple(pts){
+    if(pts===""||pts===null||pts===undefined) return '<span class="mc-blank">&mdash;</span>';
+    return '<span class="mc-pts">'+parseFloat(pts)+'</span>';
+  }
+
+  var h='<div class="tbl-wrap"><table><thead><tr>';
+  h+='<th>Team</th>';
+  h+='<th class="mc-hdr">G1</th><th class="mc-hdr">G2</th><th class="mc-hdr">G3</th>';
+  h+='<th class="mc-hdr">R32</th><th class="mc-hdr">R16</th><th class="mc-hdr">QF</th>';
+  h+='<th class="mc-hdr">SF</th><th class="mc-hdr">F</th><th class="mc-hdr">3rd</th>';
+  h+='<th class="mc-hdr">Total</th>';
+  h+='</tr></thead><tbody>';
+
+  for(var i=0;i<matchPts.length;i++){
+    var r=matchPts[i];
+    var team=String(r[kTeam]||"").trim();
+    if(!team)continue;
+    var tot=r[kTot];
+    h+='<tr>';
+    h+='<td><span class="tm-chip">'+fg(team)+' '+team+'</span></td>';
+    h+='<td class="mc">'+cell(r[kP1],r[kD1])+'</td>';
+    h+='<td class="mc">'+cell(r[kP2],r[kD2])+'</td>';
+    h+='<td class="mc">'+cell(r[kP3],r[kD3])+'</td>';
+    h+='<td class="mc">'+cellSimple(r[kR32])+'</td>';
+    h+='<td class="mc">'+cellSimple(r[kR16])+'</td>';
+    h+='<td class="mc">'+cellSimple(r[kQF])+'</td>';
+    h+='<td class="mc">'+cellSimple(r[kSF])+'</td>';
+    h+='<td class="mc">'+cellSimple(r[kFI])+'</td>';
+    h+='<td class="mc">'+cellSimple(r[k3rd])+'</td>';
+    h+='<td class="mc"><span class="'+(tot!==""&&tot!==null&&tot!==undefined?"mc-total":"mc-blank")+'">'+(tot!==""&&tot!==null&&tot!==undefined?parseFloat(tot):"&mdash;")+'</span></td>';
+    h+='</tr>';
+  }
+
+  h+='</tbody></table></div>';el.innerHTML=h;
+}
+
+function render(){rTop();rEmp();rTm();rSq();rMatch()}
 render();load();setInterval(load,REFRESH*1000);
 </script>
 </body>
