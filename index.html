@@ -87,12 +87,37 @@ td.tc{vertical-align:middle}
 .picks-n{color:var(--tx3);font-size:11px;font-variant-numeric:tabular-nums}
 
 /* Match Points */
-.mc{text-align:center;min-width:52px;padding:7px 8px !important}
+.mc{text-align:center;min-width:68px;padding:6px 6px !important}
 .mc-date{font-size:9px;color:var(--tx3);letter-spacing:.2px;white-space:nowrap;display:block;margin-bottom:1px}
+.mc-opp{font-size:9px;color:var(--tx2);white-space:nowrap;display:block;margin-bottom:1px}
 .mc-pts{font-size:12px;font-weight:500;color:var(--tx);font-variant-numeric:tabular-nums}
 .mc-blank{font-size:11px;color:var(--tx3);opacity:.35}
 .mc-total{font-weight:600;color:var(--gold)}
 .mc-hdr{font-size:9px !important;text-align:center;letter-spacing:.5px;padding:8px 6px !important;white-space:nowrap}
+
+/* Knockout Bracket */
+.bk-wrap{overflow-x:auto;padding-bottom:1rem}
+.bk{display:flex;align-items:stretch;gap:2px;min-height:500px}
+.bk-col{display:flex;flex-direction:column;justify-content:space-around;min-width:120px;gap:2px;position:relative}
+.bk-col-lbl{font-size:9px;color:var(--tx3);text-align:center;letter-spacing:1px;text-transform:uppercase;font-weight:500;padding:0 0 8px;white-space:nowrap}
+.bk-m{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:4px 6px;min-width:114px;font-size:11px;position:relative;transition:border-color .2s}
+.bk-m-done{border-color:var(--border2)}
+.bk-date{font-size:8px;color:var(--tx3);letter-spacing:.3px;margin-bottom:3px;text-align:center}
+.bk-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;gap:6px}
+.bk-name{color:var(--tx2);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:72px}
+.bk-score{font-size:11px;font-weight:600;color:var(--tx);font-variant-numeric:tabular-nums;min-width:14px;text-align:right}
+.bk-w .bk-name{color:var(--tx);font-weight:500}
+.bk-w .bk-score{color:var(--gold)}
+.bk-pts{font-size:8px;color:var(--tx3);text-align:right;opacity:.6}
+.bk-tbd .bk-name{color:var(--tx3);font-style:italic;font-size:9px}
+.bk-final .bk-m{border-color:rgba(201,169,110,.25);background:linear-gradient(180deg,rgba(201,169,110,.04) 0%,var(--card) 100%)}
+.bk-3rd{margin-top:1.5rem;display:flex;justify-content:center}
+.bk-3rd-wrap{text-align:center}
+.bk-3rd-lbl{font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;font-weight:500;margin-bottom:6px}
+/* Connector lines */
+.bk-col:not(.bk-final)::after{content:none}
+.bk-cn-r .bk-m::after{content:'';position:absolute;right:-3px;top:50%;width:3px;height:1px;background:var(--border2)}
+.bk-cn-l .bk-m::after{content:'';position:absolute;left:-3px;top:50%;width:3px;height:1px;background:var(--border2)}
 
 /* Rules Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center}
@@ -137,6 +162,9 @@ td.tc{vertical-align:middle}
   .hdr,.wrap{padding-left:1rem;padding-right:1rem}
   table{min-width:420px;font-size:11px}
   th,td{padding:8px 10px}
+  .bk-col{min-width:100px}
+  .bk-m{min-width:96px;padding:3px 5px}
+  .bk-name{max-width:60px;font-size:9px}
 }
 </style>
 </head>
@@ -179,6 +207,9 @@ td.tc{vertical-align:middle}
 <div class="sec-title" style="margin-top:2rem">Team Match Points</div>
 <div id="s5"></div>
 
+<div class="sec-title" style="margin-top:2rem">Knockout Bracket</div>
+<div id="s6"></div>
+
 </div>
 
 <div id="rulesModal" class="modal-overlay" onclick="if(event.target===this)toggleRules()">
@@ -203,6 +234,7 @@ td.tc{vertical-align:middle}
 <script>
 var API = "https://script.google.com/macros/s/AKfycbyJ0KhGIHFFyWHU6G6NtsPvRwPXAXIdfQDoT_BgTkYq2eLQI6D4PriiuGJjinxauDzh/exec";
 var MATCH_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgSClAbj5LVtZp19FF6FcuRQTYRR3NzL4Bf5QDkIVYCEx7YGqUlv2vtmeIXiPAJKb025lharsd8unY/pub?gid=1423306191&single=true&output=csv";
+var KNOCKOUT_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgSClAbj5LVtZp19FF6FcuRQTYRR3NzL4Bf5QDkIVYCEx7YGqUlv2vtmeIXiPAJKb025lharsd8unY/pub?gid=12511540&single=true&output=csv";
 var REFRESH = 60;
 var FL={"France":"\u{1F1EB}\u{1F1F7}","Norway":"\u{1F1F3}\u{1F1F4}","New Zealand":"\u{1F1F3}\u{1F1FF}","Spain":"\u{1F1EA}\u{1F1F8}","Belgium":"\u{1F1E7}\u{1F1EA}","Jordan":"\u{1F1EF}\u{1F1F4}","England":"\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}","Sweden":"\u{1F1F8}\u{1F1EA}","Panama":"\u{1F1F5}\u{1F1E6}","Czechia":"\u{1F1E8}\u{1F1FF}","Scotland":"\u{1F3F4}\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}","Haiti":"\u{1F1ED}\u{1F1F9}","Colombia":"\u{1F1E8}\u{1F1F4}","Cote d'Ivoire":"\u{1F1E8}\u{1F1EE}","Morocco":"\u{1F1F2}\u{1F1E6}","Brazil":"\u{1F1E7}\u{1F1F7}","Argentina":"\u{1F1E6}\u{1F1F7}","Germany":"\u{1F1E9}\u{1F1EA}","Portugal":"\u{1F1F5}\u{1F1F9}","Netherlands":"\u{1F1F3}\u{1F1F1}","Italy":"\u{1F1EE}\u{1F1F9}","Japan":"\u{1F1EF}\u{1F1F5}"};
 function fg(n){return FL[n]||"\u{1F3F3}\u{FE0F}"}
@@ -218,7 +250,7 @@ var FB=[
 {name:"Ari",pts:0,t1:"Spain",t2:"Colombia",t3:"Jordan"}
 ];
 
-var emps=FB.slice(),teamsData=[],matchPts=[],logs=[],busy=false;
+var emps=FB.slice(),teamsData=[],matchPts=[],knockoutData=[],logs=[],busy=false;
 
 // CSV parser for match points
 function parseCSV(text){
@@ -339,7 +371,23 @@ function load(){
     log("Match CSV: "+err.message,false);
   });
 
-  Promise.all([mainFetch,matchFetch])
+  var koFetch = fetch(KNOCKOUT_CSV+"&_t="+Date.now(),{cache:"no-store"})
+  .then(function(r){
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    return r.text();
+  })
+  .then(function(text){
+    var rows=parseCSV(text);
+    if(rows.length>0){
+      knockoutData=rows;
+      log("Knockout: "+rows.length+" matches",true);
+    }
+  })
+  .catch(function(err){
+    log("Knockout CSV: "+err.message,false);
+  });
+
+  Promise.all([mainFetch,matchFetch,koFetch])
   .finally(function(){
     render();
     document.getElementById("clock").textContent=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
@@ -457,16 +505,15 @@ function rMatch(){
       kR32=fk("32 teams"),kR16=fk("16 teams"),kQF=fk("Quarterfinals"),
       kSF=fk("Semifinals"),kFI=fk("Final"),k3rd=fk("3rd Place"),kTot=fk("Total");
 
-  function cell(pts,date){
+  function cell(pts,date,opp){
+    var info='';
+    if(opp&&opp.length>0) info+='<span class="mc-opp">'+fg(opp)+' '+opp+'</span>';
+    if(date&&date.length>0) info+='<span class="mc-date">'+date+'</span>';
     if(pts===""||pts===null||pts===undefined){
-      if(date&&date.length>0) return '<span class="mc-date">'+date+'</span><span class="mc-blank">&mdash;</span>';
+      if(info) return info+'<span class="mc-blank">&mdash;</span>';
       return '<span class="mc-blank">&mdash;</span>';
     }
-    var n=parseFloat(pts);
-    var out='';
-    if(date&&date.length>0) out+='<span class="mc-date">'+date+'</span>';
-    out+='<span class="mc-pts">'+n+'</span>';
-    return out;
+    return info+'<span class="mc-pts">'+parseFloat(pts)+'</span>';
   }
   function cellSimple(pts){
     if(pts===""||pts===null||pts===undefined) return '<span class="mc-blank">&mdash;</span>';
@@ -488,9 +535,9 @@ function rMatch(){
     var tot=r[kTot];
     h+='<tr>';
     h+='<td><span class="tm-chip">'+fg(team)+' '+team+'</span></td>';
-    h+='<td class="mc">'+cell(r[kP1],r[kD1])+'</td>';
-    h+='<td class="mc">'+cell(r[kP2],r[kD2])+'</td>';
-    h+='<td class="mc">'+cell(r[kP3],r[kD3])+'</td>';
+    h+='<td class="mc">'+cell(r[kP1],r[kD1],r[kG1])+'</td>';
+    h+='<td class="mc">'+cell(r[kP2],r[kD2],r[kG2])+'</td>';
+    h+='<td class="mc">'+cell(r[kP3],r[kD3],r[kG3])+'</td>';
     h+='<td class="mc">'+cellSimple(r[kR32])+'</td>';
     h+='<td class="mc">'+cellSimple(r[kR16])+'</td>';
     h+='<td class="mc">'+cellSimple(r[kQF])+'</td>';
@@ -504,7 +551,126 @@ function rMatch(){
   h+='</tbody></table></div>';el.innerHTML=h;
 }
 
-function render(){rTop();rEmp();rTm();rSq();rMatch()}
+// ── Knockout Bracket ──
+function rBracket(){
+  var el=document.getElementById("s6");
+  if(!knockoutData.length){el.innerHTML='';return}
+
+  var keys=Object.keys(knockoutData[0]);
+  function fk(t){for(var i=0;i<keys.length;i++){if(keys[i].trim()===t)return keys[i]}return t}
+  var K={round:fk("round"),mid:fk("match_id"),sort:fk("sort_order"),side:fk("bracket_side"),
+    pos:fk("bracket_position"),date:fk("date"),a:fk("side_a"),b:fk("side_b"),
+    sa:fk("score_a"),sb:fk("score_b"),win:fk("winner"),lose:fk("loser"),
+    st:fk("status"),pa:fk("points_a"),pb:fk("points_b")};
+
+  // Classify rounds
+  function rOrd(r){
+    r=(r||"").toLowerCase();
+    if(r.indexOf("32")>=0)return 1;if(r.indexOf("16")>=0)return 2;
+    if(r.indexOf("quarter")>=0)return 3;if(r.indexOf("semi")>=0)return 4;
+    if(r.indexOf("final")>=0&&r.indexOf("semi")<0&&r.indexOf("quarter")<0)return 5;
+    if(r.indexOf("3")>=0&&r.indexOf("place")>=0)return 6;return 0;
+  }
+  function rLbl(r){
+    var o=rOrd(r);
+    return o===1?"R32":o===2?"R16":o===3?"QF":o===4?"SF":o===5?"FINAL":o===6?"3RD":r;
+  }
+
+  // Parse matches
+  var matches=[];
+  for(var i=0;i<knockoutData.length;i++){
+    var r=knockoutData[i];
+    matches.push({
+      round:String(r[K.round]||""),side:String(r[K.side]||"").toLowerCase().trim(),
+      pos:parseInt(r[K.pos])||0,sort:parseInt(r[K.sort])||0,
+      date:String(r[K.date]||""),a:String(r[K.a]||""),b:String(r[K.b]||""),
+      sa:String(r[K.sa]||""),sb:String(r[K.sb]||""),
+      win:String(r[K.win]||""),st:String(r[K.st]||""),
+      pa:String(r[K.pa]||""),pb:String(r[K.pb]||"")
+    });
+  }
+  matches.sort(function(a,b){return a.sort-b.sort||a.pos-b.pos});
+
+  // Group: left rounds, right rounds, final, 3rd
+  var left={},right={},final=[],third=[];
+  for(var i=0;i<matches.length;i++){
+    var m=matches[i],o=rOrd(m.round);
+    if(o===6){third.push(m);continue}
+    if(o===5||m.side==="center"){final.push(m);continue}
+    if(m.side==="left"){
+      if(!left[o])left[o]=[];left[o].push(m);
+    } else if(m.side==="right"){
+      if(!right[o])right[o]=[];right[o].push(m);
+    }
+  }
+
+  // Get sorted round orders
+  var lRounds=Object.keys(left).map(Number).sort(function(a,b){return a-b});
+  var rRounds=Object.keys(right).map(Number).sort(function(a,b){return a-b});
+
+  // Render match box
+  function mBox(m){
+    var done=m.sa!==""&&m.sb!=="";
+    var isPlaceholder=function(t){return!t||t.indexOf("Winner")>=0||t.indexOf("Loser")>=0||t.indexOf("TBD")>=0||t===""};
+    var aWin=m.win&&m.a&&m.win.toLowerCase()===m.a.toLowerCase();
+    var bWin=m.win&&m.b&&m.win.toLowerCase()===m.b.toLowerCase();
+    var tbd=isPlaceholder(m.a)&&isPlaceholder(m.b);
+    var cls="bk-m"+(done?" bk-m-done":"")+(tbd?" bk-tbd":"");
+    var h='<div class="'+cls+'">';
+    if(m.date)h+='<div class="bk-date">'+m.date+'</div>';
+    // Team A
+    h+='<div class="bk-row'+(aWin?" bk-w":"")+'">';
+    h+='<span class="bk-name">'+(m.a?(isPlaceholder(m.a)?m.a:fg(m.a)+' '+m.a):"TBD")+'</span>';
+    h+='<span class="bk-score">'+(done?m.sa:"")+'</span>';
+    h+='</div>';
+    // Team B
+    h+='<div class="bk-row'+(bWin?" bk-w":"")+'">';
+    h+='<span class="bk-name">'+(m.b?(isPlaceholder(m.b)?m.b:fg(m.b)+' '+m.b):"TBD")+'</span>';
+    h+='<span class="bk-score">'+(done?m.sb:"")+'</span>';
+    h+='</div>';
+    // Fantasy points
+    if(done&&(m.pa||m.pb)){
+      h+='<div style="display:flex;justify-content:space-between;margin-top:2px">';
+      h+='<span class="bk-pts">'+(m.pa?m.pa+"fp":"")+'</span>';
+      h+='<span class="bk-pts">'+(m.pb?m.pb+"fp":"")+'</span></div>';
+    }
+    h+='</div>';
+    return h;
+  }
+
+  // Build column
+  function col(matchArr,label,cls){
+    var h='<div class="bk-col '+(cls||"")+'">';
+    h+='<div class="bk-col-lbl">'+label+'</div>';
+    for(var i=0;i<matchArr.length;i++)h+=mBox(matchArr[i]);
+    h+='</div>';return h;
+  }
+
+  // Assemble bracket
+  var html='<div class="bk-wrap"><div class="bk">';
+  // Left side (outermost to innermost)
+  for(var i=0;i<lRounds.length;i++){
+    html+=col(left[lRounds[i]],rLbl(left[lRounds[i]][0].round),"bk-cn-r");
+  }
+  // Final
+  if(final.length){html+=col(final,"FINAL","bk-final")}
+  // Right side (innermost to outermost)
+  for(var i=rRounds.length-1;i>=0;i--){
+    html+=col(right[rRounds[i]],rLbl(right[rRounds[i]][0].round),"bk-cn-l");
+  }
+  html+='</div>';
+  // 3rd place
+  if(third.length){
+    html+='<div class="bk-3rd"><div class="bk-3rd-wrap">';
+    html+='<div class="bk-3rd-lbl">3rd Place</div>';
+    html+=mBox(third[0]);
+    html+='</div></div>';
+  }
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+function render(){rTop();rEmp();rTm();rSq();rMatch();rBracket()}
 render();load();setInterval(load,REFRESH*1000);
 </script>
 </body>
