@@ -96,28 +96,54 @@ td.tc{vertical-align:middle}
 .mc-hdr{font-size:9px !important;text-align:center;letter-spacing:.5px;padding:8px 6px !important;white-space:nowrap}
 
 /* Knockout Bracket */
-.bk-wrap{overflow-x:auto;padding-bottom:1rem}
-.bk{display:flex;align-items:stretch;gap:2px;min-height:500px}
-.bk-col{display:flex;flex-direction:column;justify-content:space-around;min-width:120px;gap:2px;position:relative}
-.bk-col-lbl{font-size:9px;color:var(--tx3);text-align:center;letter-spacing:1px;text-transform:uppercase;font-weight:500;padding:0 0 8px;white-space:nowrap}
-.bk-m{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:4px 6px;min-width:114px;font-size:11px;position:relative;transition:border-color .2s}
+.bk-wrap{overflow-x:auto;padding:0 0 1.5rem}
+.bk{display:flex;align-items:stretch;min-height:520px}
+.bk-col{display:flex;flex-direction:column;min-width:118px}
+.bk-col-lbl{font-size:9px;color:var(--tx3);text-align:center;letter-spacing:1.2px;text-transform:uppercase;font-weight:500;padding:0 0 8px;white-space:nowrap}
+.bk-pair{flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px}
+/* Match box */
+.bk-m{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:5px 7px;font-size:11px;position:relative;transition:border-color .2s}
 .bk-m-done{border-color:var(--border2)}
-.bk-date{font-size:8px;color:var(--tx3);letter-spacing:.3px;margin-bottom:3px;text-align:center}
-.bk-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;gap:6px}
+.bk-date{font-size:8px;color:var(--tx3);letter-spacing:.3px;margin-bottom:2px;text-align:center}
+.bk-row{display:flex;justify-content:space-between;align-items:center;padding:1.5px 0;gap:4px}
 .bk-name{color:var(--tx2);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:72px}
 .bk-score{font-size:11px;font-weight:600;color:var(--tx);font-variant-numeric:tabular-nums;min-width:14px;text-align:right}
 .bk-w .bk-name{color:var(--tx);font-weight:500}
 .bk-w .bk-score{color:var(--gold)}
 .bk-pts{font-size:8px;color:var(--tx3);text-align:right;opacity:.6}
 .bk-tbd .bk-name{color:var(--tx3);font-style:italic;font-size:9px}
-.bk-final .bk-m{border-color:rgba(201,169,110,.25);background:linear-gradient(180deg,rgba(201,169,110,.04) 0%,var(--card) 100%)}
+/* Connector lines - left side (rightward) */
+.bk-cn-r .bk-m::after{content:'';position:absolute;right:-9px;top:50%;width:9px;height:1px;background:rgba(255,255,255,.07)}
+.bk-con-r{display:flex;flex-direction:column;width:16px;min-width:16px}
+.bk-con-r .bk-seg{flex:1;position:relative}
+.bk-con-r .bk-seg::before{content:'';position:absolute;left:0;top:25%;bottom:25%;width:1px;background:rgba(255,255,255,.07)}
+.bk-con-r .bk-seg::after{content:'';position:absolute;left:0;top:50%;width:100%;height:1px;background:rgba(255,255,255,.07)}
+/* Connector lines - right side (leftward) */
+.bk-cn-l .bk-m::after{content:'';position:absolute;left:-9px;top:50%;width:9px;height:1px;background:rgba(255,255,255,.07)}
+.bk-con-l{display:flex;flex-direction:column;width:16px;min-width:16px}
+.bk-con-l .bk-seg{flex:1;position:relative}
+.bk-con-l .bk-seg::before{content:'';position:absolute;right:0;top:25%;bottom:25%;width:1px;background:rgba(255,255,255,.07)}
+.bk-con-l .bk-seg::after{content:'';position:absolute;right:0;top:50%;width:100%;height:1px;background:rgba(255,255,255,.07)}
+/* Incoming lines to match from connector */
+.bk-in-l .bk-m::before{content:'';position:absolute;left:-9px;top:50%;width:9px;height:1px;background:rgba(255,255,255,.07)}
+.bk-in-r .bk-m::before{content:'';position:absolute;right:-9px;top:50%;width:9px;height:1px;background:rgba(255,255,255,.07)}
+/* Final - centerpiece */
+.bk-final-col{display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:160px;padding:0 8px}
+.bk-final-lbl{font-size:12px;color:var(--gold);text-align:center;letter-spacing:3px;text-transform:uppercase;font-weight:600;margin-bottom:10px}
+.bk-final-m{background:linear-gradient(180deg,rgba(201,169,110,.06) 0%,var(--card) 100%);border:1px solid rgba(201,169,110,.3);border-radius:4px;padding:10px 14px;min-width:150px;font-size:12px;position:relative;box-shadow:0 0 40px rgba(201,169,110,.06),0 2px 8px rgba(0,0,0,.3)}
+.bk-final-m .bk-date{font-size:9px;margin-bottom:4px}
+.bk-final-m .bk-row{padding:3px 0}
+.bk-final-m .bk-name{font-size:12px;max-width:90px}
+.bk-final-m .bk-score{font-size:14px}
+.bk-final-m .bk-w .bk-name{color:var(--gold)}
+.bk-final-m .bk-w .bk-score{color:var(--gold);font-size:16px}
+/* Incoming lines to final */
+.bk-final-m::before{content:'';position:absolute;left:-17px;top:50%;width:17px;height:1px;background:rgba(201,169,110,.15)}
+.bk-final-m::after{content:'';position:absolute;right:-17px;top:50%;width:17px;height:1px;background:rgba(201,169,110,.15)}
+/* 3rd place */
 .bk-3rd{margin-top:1.5rem;display:flex;justify-content:center}
 .bk-3rd-wrap{text-align:center}
-.bk-3rd-lbl{font-size:9px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;font-weight:500;margin-bottom:6px}
-/* Connector lines */
-.bk-col:not(.bk-final)::after{content:none}
-.bk-cn-r .bk-m::after{content:'';position:absolute;right:-3px;top:50%;width:3px;height:1px;background:var(--border2)}
-.bk-cn-l .bk-m::after{content:'';position:absolute;left:-3px;top:50%;width:3px;height:1px;background:var(--border2)}
+.bk-3rd-lbl{font-size:9px;color:var(--tx3);letter-spacing:1.2px;text-transform:uppercase;font-weight:500;margin-bottom:6px}
 
 /* Rules Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center}
@@ -165,6 +191,9 @@ td.tc{vertical-align:middle}
   .bk-col{min-width:100px}
   .bk-m{min-width:96px;padding:3px 5px}
   .bk-name{max-width:60px;font-size:9px}
+  .bk-final-col{min-width:130px}
+  .bk-final-m{min-width:120px;padding:8px 10px}
+  .bk-final-m .bk-name{max-width:72px}
 }
 </style>
 </head>
@@ -558,25 +587,20 @@ function rBracket(){
 
   var keys=Object.keys(knockoutData[0]);
   function fk(t){for(var i=0;i<keys.length;i++){if(keys[i].trim()===t)return keys[i]}return t}
-  var K={round:fk("round"),mid:fk("match_id"),sort:fk("sort_order"),side:fk("bracket_side"),
+  var K={round:fk("round"),sort:fk("sort_order"),side:fk("bracket_side"),
     pos:fk("bracket_position"),date:fk("date"),a:fk("side_a"),b:fk("side_b"),
-    sa:fk("score_a"),sb:fk("score_b"),win:fk("winner"),lose:fk("loser"),
+    sa:fk("score_a"),sb:fk("score_b"),win:fk("winner"),
     st:fk("status"),pa:fk("points_a"),pb:fk("points_b")};
 
-  // Classify rounds
   function rOrd(r){
     r=(r||"").toLowerCase();
     if(r.indexOf("32")>=0)return 1;if(r.indexOf("16")>=0)return 2;
     if(r.indexOf("quarter")>=0)return 3;if(r.indexOf("semi")>=0)return 4;
     if(r.indexOf("final")>=0&&r.indexOf("semi")<0&&r.indexOf("quarter")<0)return 5;
-    if(r.indexOf("3")>=0&&r.indexOf("place")>=0)return 6;return 0;
+    if(r.indexOf("3")>=0&&(r.indexOf("place")>=0||r.indexOf("pla")>=0))return 6;return 0;
   }
-  function rLbl(r){
-    var o=rOrd(r);
-    return o===1?"R32":o===2?"R16":o===3?"QF":o===4?"SF":o===5?"FINAL":o===6?"3RD":r;
-  }
+  function rLbl(r){var o=rOrd(r);return o===1?"R32":o===2?"R16":o===3?"QF":o===4?"SF":o===5?"FINAL":o===6?"3RD":r}
 
-  // Parse matches
   var matches=[];
   for(var i=0;i<knockoutData.length;i++){
     var r=knockoutData[i];
@@ -591,74 +615,110 @@ function rBracket(){
   }
   matches.sort(function(a,b){return a.sort-b.sort||a.pos-b.pos});
 
-  // Group: left rounds, right rounds, final, 3rd
   var left={},right={},final=[],third=[];
   for(var i=0;i<matches.length;i++){
     var m=matches[i],o=rOrd(m.round);
     if(o===6){third.push(m);continue}
     if(o===5||m.side==="center"){final.push(m);continue}
-    if(m.side==="left"){
-      if(!left[o])left[o]=[];left[o].push(m);
-    } else if(m.side==="right"){
-      if(!right[o])right[o]=[];right[o].push(m);
-    }
+    if(m.side==="left"){if(!left[o])left[o]=[];left[o].push(m)}
+    else if(m.side==="right"){if(!right[o])right[o]=[];right[o].push(m)}
   }
+  var lR=Object.keys(left).map(Number).sort(function(a,b){return a-b});
+  var rR=Object.keys(right).map(Number).sort(function(a,b){return a-b});
 
-  // Get sorted round orders
-  var lRounds=Object.keys(left).map(Number).sort(function(a,b){return a-b});
-  var rRounds=Object.keys(right).map(Number).sort(function(a,b){return a-b});
+  function isPlc(t){return!t||t.indexOf("Winner")>=0||t.indexOf("Loser")>=0||t.indexOf("TBD")>=0||t.indexOf("winner")>=0||t===""||t.indexOf("W ")===0||t.indexOf("L ")===0}
 
-  // Render match box
-  function mBox(m){
+  function mBox(m,cls){
     var done=m.sa!==""&&m.sb!=="";
-    var isPlaceholder=function(t){return!t||t.indexOf("Winner")>=0||t.indexOf("Loser")>=0||t.indexOf("TBD")>=0||t===""};
-    var aWin=m.win&&m.a&&m.win.toLowerCase()===m.a.toLowerCase();
-    var bWin=m.win&&m.b&&m.win.toLowerCase()===m.b.toLowerCase();
-    var tbd=isPlaceholder(m.a)&&isPlaceholder(m.b);
-    var cls="bk-m"+(done?" bk-m-done":"")+(tbd?" bk-tbd":"");
-    var h='<div class="'+cls+'">';
+    var aWin=m.win&&m.a&&m.win.trim().toLowerCase()===m.a.trim().toLowerCase();
+    var bWin=m.win&&m.b&&m.win.trim().toLowerCase()===m.b.trim().toLowerCase();
+    var tbd=isPlc(m.a)&&isPlc(m.b);
+    var c=(cls||"bk-m")+(done?" bk-m-done":"")+(tbd?" bk-tbd":"");
+    var h='<div class="'+c+'">';
     if(m.date)h+='<div class="bk-date">'+m.date+'</div>';
-    // Team A
     h+='<div class="bk-row'+(aWin?" bk-w":"")+'">';
-    h+='<span class="bk-name">'+(m.a?(isPlaceholder(m.a)?m.a:fg(m.a)+' '+m.a):"TBD")+'</span>';
-    h+='<span class="bk-score">'+(done?m.sa:"")+'</span>';
-    h+='</div>';
-    // Team B
+    h+='<span class="bk-name">'+(m.a?(isPlc(m.a)?m.a:fg(m.a)+' '+m.a):"TBD")+'</span>';
+    h+='<span class="bk-score">'+(done?m.sa:"")+'</span></div>';
     h+='<div class="bk-row'+(bWin?" bk-w":"")+'">';
-    h+='<span class="bk-name">'+(m.b?(isPlaceholder(m.b)?m.b:fg(m.b)+' '+m.b):"TBD")+'</span>';
-    h+='<span class="bk-score">'+(done?m.sb:"")+'</span>';
-    h+='</div>';
-    // Fantasy points
+    h+='<span class="bk-name">'+(m.b?(isPlc(m.b)?m.b:fg(m.b)+' '+m.b):"TBD")+'</span>';
+    h+='<span class="bk-score">'+(done?m.sb:"")+'</span></div>';
     if(done&&(m.pa||m.pb)){
-      h+='<div style="display:flex;justify-content:space-between;margin-top:2px">';
+      h+='<div style="display:flex;justify-content:space-between;margin-top:1px">';
       h+='<span class="bk-pts">'+(m.pa?m.pa+"fp":"")+'</span>';
       h+='<span class="bk-pts">'+(m.pb?m.pb+"fp":"")+'</span></div>';
     }
-    h+='</div>';
-    return h;
-  }
-
-  // Build column
-  function col(matchArr,label,cls){
-    var h='<div class="bk-col '+(cls||"")+'">';
-    h+='<div class="bk-col-lbl">'+label+'</div>';
-    for(var i=0;i<matchArr.length;i++)h+=mBox(matchArr[i]);
     h+='</div>';return h;
   }
 
-  // Assemble bracket
+  // Build round column with pair wrappers
+  function buildCol(arr,label,connCls,inCls){
+    var h='<div class="bk-col '+connCls+' '+inCls+'">';
+    h+='<div class="bk-col-lbl">'+label+'</div>';
+    // Wrap matches in pairs
+    for(var i=0;i<arr.length;i+=2){
+      h+='<div class="bk-pair">';
+      h+=mBox(arr[i]);
+      if(i+1<arr.length)h+=mBox(arr[i+1]);
+      h+='</div>';
+    }
+    if(arr.length===1){}// single match, no pairing needed
+    h+='</div>';return h;
+  }
+
+  // Connector column
+  function connCol(numSegs,cls){
+    var h='<div class="'+cls+'">';
+    for(var i=0;i<numSegs;i++) h+='<div class="bk-seg"></div>';
+    h+='</div>';return h;
+  }
+
   var html='<div class="bk-wrap"><div class="bk">';
-  // Left side (outermost to innermost)
-  for(var i=0;i<lRounds.length;i++){
-    html+=col(left[lRounds[i]],rLbl(left[lRounds[i]][0].round),"bk-cn-r");
+
+  // Left side
+  for(var i=0;i<lR.length;i++){
+    var arr=left[lR[i]];
+    var lbl=rLbl(arr[0].round);
+    var isLast=i===lR.length-1;
+    html+=buildCol(arr,lbl,"bk-cn-r",i>0?"bk-in-l":"");
+    // Add connector after this column (except after the last left column before final)
+    if(!isLast){
+      var nextArr=left[lR[i+1]];
+      html+=connCol(nextArr?nextArr.length:1,"bk-con-r");
+    }
   }
+
+  // Connector into final from left
+  if(lR.length>0) html+=connCol(1,"bk-con-r");
+
   // Final
-  if(final.length){html+=col(final,"FINAL","bk-final")}
-  // Right side (innermost to outermost)
-  for(var i=rRounds.length-1;i>=0;i--){
-    html+=col(right[rRounds[i]],rLbl(right[rRounds[i]][0].round),"bk-cn-l");
+  if(final.length){
+    html+='<div class="bk-final-col">';
+    html+='<div class="bk-final-lbl">Final</div>';
+    html+=mBox(final[0],"bk-final-m");
+    html+='</div>';
   }
+
+  // Connector into final from right
+  if(rR.length>0) html+=connCol(1,"bk-con-l");
+
+  // Right side (innermost to outermost)
+  for(var i=rR.length-1;i>=0;i--){
+    var arr=right[rR[i]];
+    var lbl=rLbl(arr[0].round);
+    var isLast=i===0;
+    if(i<rR.length-1){
+      var prevArr=right[rR[i+1]];
+      // No extra connector needed, handled by column classes
+    }
+    html+=buildCol(arr,lbl,"bk-cn-l",i<rR.length-1?"bk-in-r":"");
+    if(!isLast){
+      var nextArr=right[rR[i-1]];
+      html+=connCol(nextArr?nextArr.length:1,"bk-con-l");
+    }
+  }
+
   html+='</div>';
+
   // 3rd place
   if(third.length){
     html+='<div class="bk-3rd"><div class="bk-3rd-wrap">';
